@@ -1,3 +1,5 @@
+
+
 let scoreLettersInText = 0;
 
 
@@ -164,30 +166,36 @@ function basicStatistics(mapOfVowe_sort){
 
 
 function probability(map){
-    
-    //let table = document.createElement("table");
-    //let row1 = document.createElement('tr');
     let row1 = row2 = `<tr>`;
     let totalNum = mathExpectation = disperthon = 0;
 
     map.forEach((value) => totalNum += value);
-    let probabilityLetter = 100 / totalNum;
+    let probabilityLetter = 1 / totalNum;
 
-    var v = []
-    let labes = []
+
+    var v = [];
+    let labes = ['а', 'е', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'ё'];
+
 
     for(let entry of map){
         row1 += `<td>${entry[0]}</td>`
         row2 += `<td>${(entry[1] * probabilityLetter).toFixed(2)}</td>`
         mathExpectation += entry[1] * (entry[1] * probabilityLetter).toFixed(2);
         disperthon += Math.pow(entry[1], 2) * (entry[1] * probabilityLetter).toFixed(2);
-        v.push((entry[1] * probabilityLetter).toFixed(2));
-        labes.push(entry[0]);
+
     }
     row1 += '</tr>';
     row2 += '</tr>';
 
-   
+    let sortMapOfKey = new Map([...map.entries()].sort())
+
+    console.log(sortMapOfKey);
+
+    for(let entr of sortMapOfKey){
+        v.push((entr[1] * probabilityLetter).toFixed(2));
+    }
+
+    
 
     let table = document.createElement("table");
     table.classList.add('probability')
@@ -200,48 +208,35 @@ function probability(map){
     <p>Среднее квадратичное значение: ${Math.sqrt(disperthon).toFixed(2)}</p>
     `;
 
-    let d = document.createElement("div");
-    d.className = "ct-chart ct-perfect-fourth";
-    d.style.width = `1000px`,
-    d.style.height = `500px`
+    let d = document.createElement("canvas");
+    d.id = "myChart";
+    // d.style.width = `1000px`,
+    // d.style.height = `500px`
     document.querySelector('body').append(table, p, d);
     
 
+    const ctx = document.getElementById('myChart');
 
-    new Chartist.Line('.ct-chart', {
-        series: [[
-          {x: 1, y: v[0]},
-          {x: 2, y: v[1]},
-          {x: 3, y: v[2]},
-          {x: 4, y: v[3]},
-          {x: 5, y: v[4]},
-          {x: 6, y: v[5]},
-          {x: 7, y: v[6]},
-          {x: 8, y: v[7]},
-          {x: 9, y: v[8]},
-          {x: 10, y: v[9]},
-          {x: 11, y: v[9]},
-
-        ]],
-        labels: labes,
-      }, {
-        axisX: {
-        //   type: Chartist.AutoScaleAxis,
-        //   onlyInteger: true
-        labelInterpolationFnc: function (value) {
-            return value;
-          }
-        },
-        axisY: {
-          type: Chartist.FixedScaleAxis,
-          ticks: v,
-          low: 0
-        },
-        lineSmooth: Chartist.Interpolation.step(),
-        showPoint: false
-      });
-
-   console.log(matrix)
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labes,
+      datasets: [{
+        label: 'Математическое Распределение',
+        data: v,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+    
+  
     
 }
 
